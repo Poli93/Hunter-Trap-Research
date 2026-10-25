@@ -1,0 +1,5 @@
+## Interface: 30300
+## Title: TrapAngle
+## Notes: Shows your facing, green when it gives your traps the long reach
+## SavedVariables: TrapAngleDB
+TrapAngle.lua
