@@ -1,0 +1,8 @@
+## Interface: 30300
+## Title: MapGrid
+## Notes: Radar of the server's map square grids around you. /mapgrid hides or shows it.
+## Version: 1.0
+## Author: Idan
+## SavedVariables: MapGridDB
+Data.lua
+MapGrid.lua
