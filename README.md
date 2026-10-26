@@ -115,6 +115,9 @@ The radius is half the trap's 5 yard diameter, plus sizes:
     players:    (5/2)     (no CombatReach added)
 ```
 0.389 is the default size of a player's body, reused for every object that isn't a unit, traps included ([ObjectDefines.h](https://github.com/TrinityCore/TrinityCore/blob/07a435ee9785b454e4286a59b4eba5997bb12691/src/server/game/Entities/Object/ObjectDefines.h#L39)).
+```cpp
+#define DEFAULT_PLAYER_BOUNDING_RADIUS  0.388999998569489f  // player size, also currently used (correctly?) for any non Unit world objects
+```
 
 **Why does it spin?**
 
