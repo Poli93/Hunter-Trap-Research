@@ -137,3 +137,6 @@ Only checks made *from* a game object use the box.
 
 One example is when your target is in front of you, face one of the in-between directions (NNE, ENE, ESE…, in radians 0.393, 1.178, 1.963, 2.749, 3.534, 4.320, 5.105, 5.890) to put the long corner of the square in front of you.
 To investigate this behaviour and to measure it ingame I'm including [TrapAngle](https://github.com/Poli93/Hunter-Trap-Research/tree/main/TrapAngle) and [TrapSim](https://poli93.github.io/Hunter-Trap-Research/TrapSim/)
+
+<img width="1037" height="795" alt="image" src="https://github.com/user-attachments/assets/ca267135-5639-4cfd-8211-7654fe551ce2" />
+
