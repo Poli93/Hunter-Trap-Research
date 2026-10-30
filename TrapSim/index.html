@@ -144,6 +144,7 @@ input[type=range] { width: 100%; }
   "use strict";
   var BOX = { minX: -0.5, maxX: 0.5, minY: -0.48420584202, maxY: 0.42008346319 };
   var GO_SIZE = 0.389;
+  var EDGE_GAP = 0.001;  // the check is strict, so a target exactly on the edge would not fire
   var PLACES = { stand: 2.0, jump: 2.0 + 8 / 3 };
   var NS = "http://www.w3.org/2000/svg";
   var state = { kind: "creature", reach: 1.5, deg: 337.5, fwd: 8.5, left: 0, place: "stand" };
@@ -266,12 +267,13 @@ input[type=range] { width: 100%; }
     var v = document.getElementById("verdict");
     v.className = "result" + (m < 0 ? " yes" : "");
     v.innerHTML = '<span class="word">' + (m < 0 ? "Trap fires" : "No trigger") + "</span>" +
-      '<span class="why">' + (m < 0 ? "The target's centre is " + (-m).toFixed(2) + " yd inside the zone." :
+      '<span class="why">' + (Math.abs(m) < 0.005 ? "The target's centre is right on the edge of the zone." :
+        m < 0 ? "The target's centre is " + (-m).toFixed(2) + " yd inside the zone." :
         "The target's centre is " + m.toFixed(2) + " yd outside the zone.") + "</span>" +
-      "<dl><dt>Target to trap</dt><dd>" + dTrap.toFixed(2) + " yd</dd>" +
-      "<dt>Target to you</dt><dd>" + dYou.toFixed(2) + " yd, " + Math.abs(ang).toFixed(1) + "° " + (ang >= 0 ? "right" : "left") + "</dd>" +
+      "<dl><dt>Target now to trap</dt><dd>" + dTrap.toFixed(2) + " yd</dd>" +
+      "<dt>Target now to you</dt><dd>" + dYou.toFixed(2) + " yd, " + Math.abs(ang).toFixed(1) + "° " + (ang >= 0 ? "right" : "left") + "</dd>" +
       "<dt>Edge straight ahead</dt><dd>" + reach.toFixed(2) + " yd from the trap, " + (reach + pl).toFixed(2) + " from you</dd>" +
-      "<dt>Zone radius</dt><dd>" + r.toFixed(3) + " (" + note + ")</dd></dl>";
+      "<dt>Zone radius</dt><dd>" + r.toFixed(3) + " (" + note + "), plus the trap model: 0.42-0.50 per side</dd></dl>";
     var phase = ((state.deg * 2) % 90 + 90) % 90;  // 0 = flat side ahead, 45 = corner ahead
     document.getElementById("facingText").innerHTML = "<b>" + o.toFixed(3) + "</b> rad · " + compassName(state.deg) +
       " · " + (Math.abs(phase - 45) < 2 ? "corner ahead" : phase < 2 || phase > 88 ? "flat side ahead" : "in between");
@@ -297,7 +299,7 @@ input[type=range] { width: 100%; }
   // Shareable link: the setup lives in the URL hash.
   function writeHash() {
     var h = "f=" + rad().toFixed(4) + "&k=" + (state.kind === "player" ? "p" : "c") + "&R=" + state.reach +
-      "&d=" + Math.hypot(state.fwd, state.left).toFixed(2) + "&a=" + targetAngle().toFixed(1) + "&pl=" + state.place;
+      "&d=" + Math.hypot(state.fwd, state.left).toFixed(3) + "&a=" + targetAngle().toFixed(2) + "&pl=" + state.place;
     try { history.replaceState(null, "", "#" + h); } catch (e) { /* file:// or sandboxed */ }
   }
   function readHash() {
@@ -332,15 +334,15 @@ input[type=range] { width: 100%; }
     var d = Math.hypot(state.fwd, state.left); state.fwd = d; state.left = 0; render();
   });
   document.getElementById("btnEdge").addEventListener("click", function () {
-    state.left = 0; state.fwd = place() + reachAhead(rad(), radius()) - 0.05; fitView(); render();
+    state.left = 0; state.fwd = place() + reachAhead(rad(), radius()) - EDGE_GAP; fitView(); render();
   });
   document.getElementById("btnFar").addEventListener("click", function () {
     var o = rad(), pl = place(), trap = [pl * Math.cos(o), pl * Math.sin(o)];
     var far = zoneCorners(o, radius(), trap).reduce(function (best, c) {
       return Math.hypot(c[0], c[1]) > Math.hypot(best[0], best[1]) ? c : best;
     });
-    // Step 0.07 yd back towards the trap so the target sits just inside the corner.
-    var dx = far[0] - trap[0], dy = far[1] - trap[1], k = (Math.hypot(dx, dy) - 0.07) / Math.hypot(dx, dy);
+    // Step back towards the trap so the target sits just inside the corner.
+    var dx = far[0] - trap[0], dy = far[1] - trap[1], k = (Math.hypot(dx, dy) - EDGE_GAP) / Math.hypot(dx, dy);
     setTargetWorld([trap[0] + k * dx, trap[1] + k * dy]);
     fitView(); render();
   });
